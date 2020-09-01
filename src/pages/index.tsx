@@ -1,14 +1,16 @@
 import React from 'react'
 import Typography from '@material-ui/core/Typography'
-import Copyright from '../atoms/Coryright'
 
 export default function Index(): React.ReactElement {
+  const wasm = import('wasm-react-tutorial')
+  wasm.then((mod) => {
+    mod.greet()
+  })
   return (
     <>
       <Typography variant="h4" component="h1" gutterBottom>
-        Next.js with TypeScript example
+        wasm-react-test
       </Typography>
-      <Copyright />
     </>
   )
 }
