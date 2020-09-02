@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import TopPageAvatar from '../atoms/TopPageAvatar'
+import UserName from '../atoms/UserName'
 
 type GithubUser = {
   avatar_url: string
@@ -28,6 +29,7 @@ export default function ViewGithubUser(): React.ReactElement {
   return (
     <>
       <TopPageAvatar avatarUrl={githubUser.avatar_url} name={githubUser.name} />
+      <UserName name={githubUser.name} />
     </>
   )
 }
