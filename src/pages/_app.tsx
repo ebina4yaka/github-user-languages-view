@@ -17,6 +17,12 @@ export default function MyApp(props: AppProps): React.ReactElement {
       createMuiTheme({
         palette: {
           type: prefersDarkMode ? 'dark' : 'light',
+          primary: {
+            main: '#f06292',
+          },
+          secondary: {
+            main: '#ba68c8',
+          },
         },
       }),
     [prefersDarkMode]
