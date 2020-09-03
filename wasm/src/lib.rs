@@ -13,15 +13,16 @@ pub struct GithubUser {
     pub html_url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct GithubRepository {
-    pub id: i32,
+    pub id: u64,
     pub name: String,
     pub full_name: String,
     pub private: bool,
     pub html_url: String,
     pub url: String,
-    pub language: String,
+    pub language: Option<String>,
+    pub description: Option<String>,
 }
 
 fn set_request(url: String) -> Result<web_sys::Request, web_sys::Request> {
@@ -68,6 +69,6 @@ pub async fn get_github_user_repos(user_name: String) -> Result<JsValue, JsValue
     // Convert this other `Promise` into a rust `Future`.
     let json = JsFuture::from(response.json()?).await?;
     (json.into_serde() as Result<Vec<GithubRepository>, serde_json::error::Error>)
-        .map(|user_info| JsValue::from_serde(&user_info).unwrap())
+        .map(|repos_info| JsValue::from_serde(&repos_info).unwrap())
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
 }

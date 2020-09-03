@@ -1,6 +1,6 @@
 import React from 'react'
-import ViewGithubUser from '../organisms/ViewGitHubUser'
+import Github from '../templates/Github'
 
 export default function Index(): React.ReactElement {
-  return <ViewGithubUser />
+  return <Github />
 }
