@@ -22,6 +22,9 @@ const useStyles = makeStyles({
     alignItems: 'center',
     alignContent: 'flex-start',
   },
+  card: {
+    margin: 5,
+  },
 })
 
 export default function GithubRepos(): React.ReactElement {
@@ -39,12 +42,13 @@ export default function GithubRepos(): React.ReactElement {
     <div className={classes.root}>
       {githubRepos.map((data: GithubRepository) => {
         return (
-          <GitHubRepository
-            key={data.id}
-            name={data.name}
-            language={data.language}
-            description={data.description}
-          />
+          <div key={data.id} className={classes.card}>
+            <GitHubRepository
+              name={data.name}
+              language={data.language}
+              description={data.description}
+            />
+          </div>
         )
       })}
     </div>
