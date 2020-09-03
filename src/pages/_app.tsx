@@ -49,7 +49,7 @@ export default function MyApp(props: AppProps): React.ReactElement {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <header />
-        <Container maxWidth="lg">
+        <Container maxWidth="md">
           <Box my={4}>
             <Component {...pageProps} />
           </Box>
