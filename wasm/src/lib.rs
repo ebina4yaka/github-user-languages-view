@@ -1,3 +1,4 @@
+use chrono::DateTime;
 use load_dotenv::load_dotenv;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -13,7 +14,7 @@ pub struct GithubUser {
     pub html_url: String,
 }
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GithubRepository {
     pub id: u64,
     pub name: String,
@@ -21,6 +22,7 @@ pub struct GithubRepository {
     pub private: bool,
     pub html_url: String,
     pub url: String,
+    pub updated_at: String,
     pub language: Option<String>,
     pub description: Option<String>,
 }
@@ -51,6 +53,50 @@ async fn get_response(url: String) -> Result<web_sys::Response, web_sys::Request
     return Ok(response);
 }
 
+fn partition_repositories(repos_info: &mut Vec<GithubRepository>, l: isize, h: isize) -> isize {
+    let mut i = l - 1; // Index of the smaller element
+    for j in l..h {
+        if DateTime::parse_from_rfc3339(&repos_info[h as usize].updated_at).unwrap()
+            <= DateTime::parse_from_rfc3339(&repos_info[j as usize].updated_at).unwrap()
+        {
+            i = i + 1;
+            repos_info.swap(i as usize, j as usize);
+        }
+    }
+    repos_info.swap((i + 1) as usize, h as usize);
+    i + 1
+}
+
+fn quick_sort_partition_repositories(
+    repos_info: &mut Vec<GithubRepository>,
+    start: isize,
+    end: isize,
+) {
+    if start < end && end - start >= 1 {
+        let pivot = partition_repositories(repos_info, start as isize, end as isize);
+        quick_sort_partition_repositories(repos_info, start, pivot - 1);
+        quick_sort_partition_repositories(repos_info, pivot + 1, end);
+    }
+}
+
+fn sort_repositories(repos_info: &mut Vec<GithubRepository>) {
+    let start = 0;
+    let end = repos_info.len() - 1;
+    quick_sort_partition_repositories(repos_info, start, end as isize);
+}
+
+fn exclude_repositories_that_do_not_have_a_language(
+    repos_info: Vec<GithubRepository>,
+) -> Vec<GithubRepository> {
+    let mut filtered_repos: Vec<GithubRepository> = repos_info
+        .into_iter()
+        .filter(|repo| repo.language != None)
+        .collect::<Vec<GithubRepository>>();
+
+    sort_repositories(&mut filtered_repos);
+    return filtered_repos;
+}
+
 #[wasm_bindgen(js_name = getGithubUser)]
 pub async fn get_github_user(user_name: String) -> Result<JsValue, JsValue> {
     let url = format!("https://api.github.com/users/{}", user_name);
@@ -69,6 +115,11 @@ pub async fn get_github_user_repos(user_name: String) -> Result<JsValue, JsValue
     // Convert this other `Promise` into a rust `Future`.
     let json = JsFuture::from(response.json()?).await?;
     (json.into_serde() as Result<Vec<GithubRepository>, serde_json::error::Error>)
-        .map(|repos_info| JsValue::from_serde(&repos_info).unwrap())
+        .map(|repos_info| {
+            JsValue::from_serde(&exclude_repositories_that_do_not_have_a_language(
+                repos_info,
+            ))
+            .unwrap()
+        })
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
 }
