@@ -1,6 +1,7 @@
 use chrono::DateTime;
 use load_dotenv::load_dotenv;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::env;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -14,7 +15,7 @@ pub struct GithubUser {
     pub html_url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GithubRepository {
     pub id: u64,
     pub name: String,
@@ -25,6 +26,12 @@ pub struct GithubRepository {
     pub updated_at: String,
     pub language: Option<String>,
     pub description: Option<String>,
+}
+
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct LanguagePercentage {
+    pub language: String,
+    pub percentage: i32,
 }
 
 fn set_request(url: String) -> Result<web_sys::Request, web_sys::Request> {
@@ -53,38 +60,6 @@ async fn get_response(url: String) -> Result<web_sys::Response, web_sys::Request
     return Ok(response);
 }
 
-fn partition_repositories(repos_info: &mut Vec<GithubRepository>, l: isize, h: isize) -> isize {
-    let mut i = l - 1; // Index of the smaller element
-    for j in l..h {
-        if DateTime::parse_from_rfc3339(&repos_info[h as usize].updated_at).unwrap()
-            <= DateTime::parse_from_rfc3339(&repos_info[j as usize].updated_at).unwrap()
-        {
-            i = i + 1;
-            repos_info.swap(i as usize, j as usize);
-        }
-    }
-    repos_info.swap((i + 1) as usize, h as usize);
-    i + 1
-}
-
-fn quick_sort_partition_repositories(
-    repos_info: &mut Vec<GithubRepository>,
-    start: isize,
-    end: isize,
-) {
-    if start < end && end - start >= 1 {
-        let pivot = partition_repositories(repos_info, start as isize, end as isize);
-        quick_sort_partition_repositories(repos_info, start, pivot - 1);
-        quick_sort_partition_repositories(repos_info, pivot + 1, end);
-    }
-}
-
-fn sort_repositories(repos_info: &mut Vec<GithubRepository>) {
-    let start = 0;
-    let end = repos_info.len() - 1;
-    quick_sort_partition_repositories(repos_info, start, end as isize);
-}
-
 fn exclude_repositories_that_do_not_have_a_language(
     repos_info: Vec<GithubRepository>,
 ) -> Vec<GithubRepository> {
@@ -93,8 +68,48 @@ fn exclude_repositories_that_do_not_have_a_language(
         .filter(|repo| repo.language != None)
         .collect::<Vec<GithubRepository>>();
 
-    sort_repositories(&mut filtered_repos);
+    filtered_repos.sort_by(|a, b| {
+        DateTime::parse_from_rfc3339(&b.updated_at)
+            .unwrap()
+            .cmp(&DateTime::parse_from_rfc3339(&a.updated_at).unwrap())
+    });
     return filtered_repos;
+}
+
+fn count_repositories_by_language(repos_info: Vec<GithubRepository>, language: &String) -> f64 {
+    let filtered_repos = repos_info
+        .into_iter()
+        .filter(|repo| repo.language.as_ref().unwrap() == language)
+        .collect::<Vec<GithubRepository>>();
+
+    return filtered_repos.len() as f64;
+}
+
+fn calculation_percentage(target: f64, size: f64) -> i32 {
+    return (target / size * 100.0).round() as i32;
+}
+
+fn calculation_langage_percentage(repos_info: Vec<GithubRepository>) -> Vec<LanguagePercentage> {
+    let mut language_percentages: HashSet<LanguagePercentage> = HashSet::new();
+    let filtered_repos = &exclude_repositories_that_do_not_have_a_language(repos_info);
+    let repos_len = filtered_repos.len() as f64;
+    for repo in filtered_repos {
+        let repo_copy = repo.clone();
+        let language = repo_copy.language.unwrap();
+        let percentage = calculation_percentage(
+            count_repositories_by_language(filtered_repos.to_vec(), &language),
+            repos_len,
+        );
+        let language = LanguagePercentage {
+            language: language,
+            percentage: percentage,
+        };
+        language_percentages.insert(language);
+    }
+    let mut language_percentages_vec: Vec<LanguagePercentage> =
+        language_percentages.into_iter().collect();
+    language_percentages_vec.sort_by(|a, b| b.percentage.cmp(&a.percentage));
+    return language_percentages_vec;
 }
 
 #[wasm_bindgen(js_name = getGithubUser)]
@@ -121,5 +136,16 @@ pub async fn get_github_user_repos(user_name: String) -> Result<JsValue, JsValue
             ))
             .unwrap()
         })
+        .map_err(|e| JsValue::from_str(&format!("{}", e)))
+}
+
+#[wasm_bindgen(js_name = getGithubUserLangagePercentages)]
+pub async fn get_github_user_langage_percentages(user_name: String) -> Result<JsValue, JsValue> {
+    let url = format!("https://api.github.com/users/{}/repos", user_name);
+    let response = get_response(url).await?;
+    // Convert this other `Promise` into a rust `Future`.
+    let json = JsFuture::from(response.json()?).await?;
+    (json.into_serde() as Result<Vec<GithubRepository>, serde_json::error::Error>)
+        .map(|repos_info| JsValue::from_serde(&calculation_langage_percentage(repos_info)).unwrap())
         .map_err(|e| JsValue::from_str(&format!("{}", e)))
 }
