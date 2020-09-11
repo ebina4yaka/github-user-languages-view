@@ -47,7 +47,7 @@ fn set_request(url: String) -> Result<web_sys::Request, web_sys::Request> {
     request
         .headers()
         .set("Authorization", &format!("bearer {}", token))?;
-    return Ok(request);
+    Ok(request)
 }
 
 async fn get_response(url: String) -> Result<web_sys::Response, web_sys::Request> {
@@ -73,20 +73,19 @@ fn exclude_repositories_that_do_not_have_a_language(
             .unwrap()
             .cmp(&DateTime::parse_from_rfc3339(&a.updated_at).unwrap())
     });
-    return filtered_repos;
+    filtered_repos
 }
 
-fn count_repositories_by_language(repos_info: Vec<GithubRepository>, language: &String) -> f64 {
+fn count_repositories_by_language(repos_info: Vec<GithubRepository>, language: &str) -> f64 {
     let filtered_repos = repos_info
         .into_iter()
-        .filter(|repo| repo.language.as_ref().unwrap() == language)
-        .collect::<Vec<GithubRepository>>();
+        .filter(|repo| repo.language.as_ref().unwrap() == language);
 
-    return filtered_repos.len() as f64;
+    filtered_repos.count() as f64
 }
 
 fn calculation_percentage(target: f64, size: f64) -> i32 {
-    return (target / size * 100.0).round() as i32;
+    (target / size * 100.0).round() as i32
 }
 
 fn calculation_langage_percentage(repos_info: Vec<GithubRepository>) -> Vec<LanguagePercentage> {
@@ -101,15 +100,15 @@ fn calculation_langage_percentage(repos_info: Vec<GithubRepository>) -> Vec<Lang
             repos_len,
         );
         let language = LanguagePercentage {
-            language: language,
-            percentage: percentage,
+            language,
+            percentage,
         };
         language_percentages.insert(language);
     }
     let mut language_percentages_vec: Vec<LanguagePercentage> =
         language_percentages.into_iter().collect();
     language_percentages_vec.sort_by(|a, b| b.percentage.cmp(&a.percentage));
-    return language_percentages_vec;
+    language_percentages_vec
 }
 
 #[wasm_bindgen(js_name = getGithubUser)]
