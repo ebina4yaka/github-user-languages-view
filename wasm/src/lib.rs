@@ -16,7 +16,7 @@ pub async fn get_github_user(user_name: String) -> Result<JsValue, JsValue> {
 }
 
 #[wasm_bindgen(js_name = getGithubUserLangagesPercentage)]
-pub async fn get_github_user_langage_percentage(
+pub async fn get_github_user_languages_percentage(
     user_name: String,
     hide_languages: String,
 ) -> Result<JsValue, JsValue> {

@@ -1,47 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { makeStyles } from '@material-ui/core'
-
-type LanguagePercentage = {
-  name: string
-  percentage: number
-}
-
-const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignContent: 'flex-start',
-  },
-  card: {
-    margin: 5,
-  },
-})
+import UserLanguagesChart from '../molecules/UserLanguagesChart'
+import LanguagesText from '../atoms/LanguagesText'
+import { LanguagePercentage } from '../models'
 
 export default function GithubLanguagesPercentage(): React.ReactElement {
-  const classes = useStyles()
   const wasm = import('../../wasm/pkg/view_github_profile')
-  const [githubRepos, setGithubRepos] = useState(Array<LanguagePercentage>())
+  const [userLanguages, setUserLanguages] = useState(
+    Array<LanguagePercentage>()
+  )
   useEffect(() => {
     wasm.then((mod) => {
       mod
         .getGithubUserLangagesPercentage('ebina4yaka', 'css,html,dockerfile')
         .then((data: LanguagePercentage[]) => {
-          setGithubRepos(data)
+          setUserLanguages(data)
         })
     })
   }, [])
   return (
-    <div className={classes.root}>
-      {githubRepos.map((data: LanguagePercentage) => {
-        return (
-          <div key={data.name} className={classes.card}>
-            {`${data.name} ${data.percentage}%`}
-          </div>
-        )
-      })}
-    </div>
+    <>
+      <UserLanguagesChart userLanguages={userLanguages} />
+      <LanguagesText userLanguages={userLanguages} />
+    </>
   )
 }
