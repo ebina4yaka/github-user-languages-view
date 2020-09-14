@@ -29,7 +29,7 @@ const useStyles = makeStyles({
 
 export default function GithubUser(): React.ReactElement {
   const classes = useStyles()
-  const wasm = import('../../wasm/pkg/wasm_nextjs_test')
+  const wasm = import('../../wasm/pkg/view_github_profile')
   const [githubUser, setGithubUser] = useState<GithubUser>(initGithubUser())
   useEffect(() => {
     wasm.then((mod) => {
