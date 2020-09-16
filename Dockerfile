@@ -28,4 +28,4 @@ RUN yarn export
 FROM nginx:1.19.2-alpine AS app
 COPY --from=node-builder /build/out /etc/nginx/html
 COPY conf.d/nginx.conf /etc/nginx/conf.d/default.conf
-CMD sed -i -e 's/$PORT/'"$PORT"'/g' /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'
+CMD GITHUB_API_TOKEN=$GITHUB_API_TOKEN sed -i -e 's/$PORT/'"$PORT"'/g' /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'
