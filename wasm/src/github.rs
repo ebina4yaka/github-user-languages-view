@@ -4,7 +4,7 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 
 fn set_request(url: String) -> Result<web_sys::Request, web_sys::Request> {
-    let token = env::var("token").expect("token is not defined");
+    let token = env::var("GITHUB_API_TOKEN").expect("GITHUB_API_TOKEN is not defined");
     let mut opts = RequestInit::new();
     opts.method("GET");
     opts.mode(RequestMode::Cors);
