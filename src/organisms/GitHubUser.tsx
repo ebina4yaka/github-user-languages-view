@@ -25,6 +25,9 @@ const useStyles = makeStyles({
     alignItems: 'center',
     alignContent: 'flex-start',
   },
+  userName: {
+    marginTop: '0.8em',
+  },
 })
 
 export default function GithubUser(): React.ReactElement {
@@ -41,7 +44,9 @@ export default function GithubUser(): React.ReactElement {
   return (
     <div className={classes.root}>
       <TopPageAvatar avatarUrl={githubUser.avatar_url} name={githubUser.name} />
-      <UserName name={githubUser.name} />
+      <div className={classes.userName}>
+        <UserName name={githubUser.name} />
+      </div>
     </div>
   )
 }
