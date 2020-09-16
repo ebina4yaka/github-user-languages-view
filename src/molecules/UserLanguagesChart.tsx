@@ -1,9 +1,9 @@
 import React from 'react'
 import { Cell, Pie, PieChart } from 'recharts'
-import { LanguagePercentage } from '../models'
+import { UserLanguage } from '../models'
 
 type Props = {
-  userLanguages: LanguagePercentage[]
+  userLanguages: UserLanguage[]
 }
 
 export default function UserLanguagesChart(props: Props): React.ReactElement {
