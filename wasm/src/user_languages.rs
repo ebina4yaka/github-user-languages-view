@@ -18,5 +18,5 @@ pub async fn get_response(url: String) -> Result<web_sys::Response, web_sys::Req
     // `resp_value` is a `Response` object.
     assert!(resp_value.is_instance_of::<Response>());
     let response: Response = resp_value.dyn_into().unwrap();
-    return Ok(response);
+    Ok(response)
 }
