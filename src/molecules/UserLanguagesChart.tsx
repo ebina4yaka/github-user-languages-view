@@ -10,7 +10,7 @@ export default function UserLanguagesChart(props: Props): React.ReactElement {
   const { userLanguages } = props
 
   return (
-    <PieChart id="userLanguages" width={320} height={320}>
+    <PieChart id="userLanguages" width={200} height={200}>
       <Pie
         data={userLanguages}
         dataKey="percentage"

@@ -7,7 +7,7 @@ type Props = {
 
 const useStyles = makeStyles({
   root: {
-    fontSize: '2em',
+    fontSize: '1.8em',
   },
 })
 

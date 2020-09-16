@@ -9,6 +9,7 @@ type Props = {
 
 const useStyles = makeStyles({
   root: {
+    width: 200,
     display: 'flex',
     flexDirection: 'column',
     flexWrap: 'wrap',

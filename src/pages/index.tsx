@@ -1,6 +1,6 @@
 import React from 'react'
-import Github from '../templates/Github'
+import IndexTemplate from '../templates/Index'
 
 export default function Index(): React.ReactElement {
-  return <Github />
+  return <IndexTemplate />
 }
