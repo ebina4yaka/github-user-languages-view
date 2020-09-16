@@ -1,10 +1,10 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core'
 import Language from '../atoms/Language'
-import { LanguagePercentage } from '../models'
+import { UserLanguage } from '../models'
 
 type Props = {
-  userLanguages: LanguagePercentage[]
+  userLanguages: UserLanguage[]
 }
 
 const useStyles = makeStyles({
@@ -26,7 +26,7 @@ export default function GithubLanguagesPercentage(
   const classes = useStyles()
   return (
     <div className={classes.root}>
-      {userLanguages.map((language: LanguagePercentage) => {
+      {userLanguages.map((language: UserLanguage) => {
         return <Language language={language} />
       })}
     </div>

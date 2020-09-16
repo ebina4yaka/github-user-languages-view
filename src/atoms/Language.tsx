@@ -1,9 +1,9 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core'
-import { LanguagePercentage } from '../models'
+import { UserLanguage } from '../models'
 
 type Props = {
-  language: LanguagePercentage
+  language: UserLanguage
 }
 
 const useStyles = makeStyles({

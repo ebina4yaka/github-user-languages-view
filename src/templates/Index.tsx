@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core'
 import Link from '@material-ui/core/Link'
 import GithubUser from '../organisms/GitHubUser'
-import GithubLanguagesPercentage from '../organisms/GithubLangagesPercentage'
+import GithubUserLanguages from '../organisms/GithubUserLanguages'
 import Footer from '../organisms/Footer'
 
 const useStyles = makeStyles({
@@ -21,10 +21,13 @@ export default function Index(): React.ReactElement {
   return (
     <>
       <div>
-        <GithubUser />
+        <GithubUser userName="ebina4yaka" />
       </div>
       <div className={classes.repos}>
-        <GithubLanguagesPercentage />
+        <GithubUserLanguages
+          hideLanguages="html,css,dockerfile"
+          userName="ebina4yaka"
+        />
       </div>
       <div className={classes.link}>
         <Link href="https://github.com/ebina4yaka/github-user-languages-view">

@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core'
 import UserLanguagesChart from '../molecules/UserLanguagesChart'
 import LanguagesList from '../molecules/LanguagesList'
-import { LanguagePercentage } from '../models'
+import { UserLanguage } from '../models'
+
+type Props = {
+  userName: string
+  hideLanguages: string
+}
 
 const useStyles = makeStyles({
   root: {
@@ -15,17 +20,16 @@ const useStyles = makeStyles({
   },
 })
 
-export default function GithubLanguagesPercentage(): React.ReactElement {
+export default function GithubUserLanguages(props: Props): React.ReactElement {
+  const { userName, hideLanguages } = props
   const classes = useStyles()
-  const wasm = import('../../wasm/pkg/view_github_profile')
-  const [userLanguages, setUserLanguages] = useState(
-    Array<LanguagePercentage>()
-  )
+  const wasm = import('../../wasm/pkg/github_user_languages_view')
+  const [userLanguages, setUserLanguages] = useState(Array<UserLanguage>())
   useEffect(() => {
     wasm.then((mod) => {
       mod
-        .getGithubUserLangagesPercentage('ebina4yaka', 'css,html,dockerfile')
-        .then((data: LanguagePercentage[]) => {
+        .getUserLanguages(userName, hideLanguages)
+        .then((data: UserLanguage[]) => {
           setUserLanguages(data)
         })
     })

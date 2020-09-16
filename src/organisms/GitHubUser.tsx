@@ -3,6 +3,10 @@ import { makeStyles } from '@material-ui/core'
 import TopPageAvatar from '../atoms/TopPageAvatar'
 import UserName from '../atoms/UserName'
 
+type Props = {
+  userName: string
+}
+
 type GithubUser = {
   avatar_url: string
   name: string
@@ -30,16 +34,16 @@ const useStyles = makeStyles({
   },
 })
 
-export default function GithubUser(): React.ReactElement {
+export default function GithubUser(props: Props): React.ReactElement {
+  const { userName } = props
   const classes = useStyles()
-  const wasm = import('../../wasm/pkg/view_github_profile')
   const [githubUser, setGithubUser] = useState<GithubUser>(initGithubUser())
   useEffect(() => {
-    wasm.then((mod) => {
-      mod.getGithubUser('ebina4yaka').then((data: GithubUser) => {
-        setGithubUser(data)
+    fetch(`https://api.github.com/users/${userName}`)
+      .then((response) => response.json())
+      .then((jsonResponse: GithubUser) => {
+        setGithubUser(jsonResponse)
       })
-    })
   }, [])
   return (
     <div className={classes.root}>

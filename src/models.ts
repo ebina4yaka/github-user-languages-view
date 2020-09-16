@@ -1,4 +1,4 @@
-export type LanguagePercentage = {
+export type UserLanguage = {
   name: string
   color: string
   percentage: number
