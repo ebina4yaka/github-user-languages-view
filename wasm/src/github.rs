@@ -13,9 +13,6 @@ fn set_request(url: String) -> Result<web_sys::Request, web_sys::Request> {
     let request = Request::new_with_str_and_init(&url, &opts)?;
     request
         .headers()
-        .set("Accept", "application/vnd.github.v3+json")?;
-    request
-        .headers()
         .set("Authorization", &format!("bearer {}", token))?;
     Ok(request)
 }
