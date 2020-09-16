@@ -4,7 +4,6 @@ RUN apk update
 RUN apk add curl gcc g++ libressl-dev
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 COPY wasm/Cargo.toml .
-COPY .env .
 COPY wasm/src src
 RUN wasm-pack build
 
