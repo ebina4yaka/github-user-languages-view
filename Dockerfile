@@ -1,5 +1,4 @@
 FROM rust:1.46.0-alpine3.12 AS wasm-builder
-
 WORKDIR /build
 RUN apk update
 RUN apk add curl gcc g++ libressl-dev
@@ -10,7 +9,6 @@ COPY wasm/src src
 RUN wasm-pack build
 
 FROM node:14.10.1-alpine3.10 AS node-builder
-
 WORKDIR /build
 RUN mkdir wasm
 COPY --from=wasm-builder /build/pkg ./wasm/pkg
@@ -29,7 +27,6 @@ RUN yarn build
 RUN yarn export
 
 FROM nginx:1.19.2-alpine AS app
-
 WORKDIR /app
 COPY --from=node-builder /build/out /etc/nginx/html
 COPY conf.d/nginx.conf /etc/nginx/conf.d/default.conf
