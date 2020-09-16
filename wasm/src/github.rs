@@ -1,12 +1,10 @@
-use load_dotenv::load_dotenv;
 use std::env;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 
 fn set_request(url: String) -> Result<web_sys::Request, web_sys::Request> {
-    load_dotenv!();
-    let token = env!("token");
+    let token = env::var("token").expect("token is not defined");
     let mut opts = RequestInit::new();
     opts.method("GET");
     opts.mode(RequestMode::Cors);
@@ -27,5 +25,5 @@ pub async fn get_response(url: String) -> Result<web_sys::Response, web_sys::Req
     // `resp_value` is a `Response` object.
     assert!(resp_value.is_instance_of::<Response>());
     let response: Response = resp_value.dyn_into().unwrap();
-    return Ok(response);
+    Ok(response)
 }
