@@ -25,7 +25,7 @@ export default function Index(): React.ReactElement {
       </div>
       <div className={classes.repos}>
         <GithubUserLanguages
-          hideLanguages="html,css,dockerfile,plpgsql"
+          hideLanguages="html,css,dockerfile,plpgsql,makefile"
           userName="ebina4yaka"
         />
       </div>
